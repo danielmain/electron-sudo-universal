@@ -1,7 +1,9 @@
-import {SudoerDarwin, SudoerWin32, SudoerLinux} from '~/lib/sudoer';
+import {platform} from 'node:process';
+import {SudoerDarwin} from '~/lib/darwin-sudoer';
+import {SudoerWin32} from '~/lib/windows-sudoer';
+import {SudoerLinux} from '~/lib/linux-sudoer';
 
 export default (() => {
-    let {platform} = process;
     switch (platform) {
         case 'darwin':
             return SudoerDarwin;

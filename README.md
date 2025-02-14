@@ -9,7 +9,7 @@ Run a subprocess with administrative privileges, prompting the user with a graph
 
 If you don't trust binaries bundled in `npm` package you can manually build tools and use them instead.
 
-<img height="150px" src="./assets/win32.png"> <img height="150px" src="./assets/osx.png"> <img height="150px" src="./assets/linux.png">
+<img height="150px" src="./assets/win32.png"> <img height="150px" src="./assets/osx.png"> <img height="150px" src="./assets/linux.png"> <img height="150px" src="./assets/nixos.png">
 
 ## Features
 - Supports `spawn` and `exec` subprocess behavior
@@ -50,10 +50,10 @@ sudo nixos-rebuild switch
 ### Version 4.0.*
 
 ```javascript
-import Sudoer from 'electron-sudo';
+import BaseSudoer from 'electron-sudo';
 
 let options = {name: 'electron sudo application'},
-    sudoer = new Sudoer(options);
+    sudoer = new BaseSudoer(options);
 
 /* Spawn subprocess behavior */
 let cp = await sudoer.spawn(
@@ -74,8 +74,8 @@ let result = await sudoer.exec(
 
 
 /* Usage with Vanilla JS */
-var Sudoer = require('electron-sudo').default;
-var sudoer = new Sudoer(options);
+var BaseSudoer = require('electron-sudo').default;
+var sudoer = new BaseSudoer(options);
 sudoer.spawn('echo', ['$PARAM'], {env: {PARAM: 'VALUE'}}).then(function (cp) {
   /*
     cp.output.stdout (Buffer)
