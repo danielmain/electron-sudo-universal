@@ -1,3 +1,21 @@
+# electron-sudo-universal
+
+> Fork of [automation-stack/electron-sudo](https://github.com/automation-stack/electron-sudo) with TypeScript support and NixOS compatibility.
+
+## Key Differences from Original
+- Full TypeScript rewrite with proper type definitions
+- Native NixOS support with automatic detection and configuration
+- Improved error handling with detailed error messages
+- Better process cleanup and resource management
+- Comprehensive test suite for all platforms
+- Modern ES module exports
+- Updated dependencies
+- Stricter type checking for options and configurations
+- Better handling of environment variables
+- Improved documentation including NixOS setup
+
+All original features are maintained while adding type safety and better platform support.
+
 ## Electron subprocess with administrative privileges
 
 Run a subprocess with administrative privileges, prompting the user with a graphical OS dialog if necessary. Useful for background subprocesses which run native Electron apps that need sudo.
@@ -91,7 +109,7 @@ sudoer.spawn('echo', ['$PARAM'], {env: {PARAM: 'VALUE'}}).then(function (cp) {
 var sudo = require('electron-sudo');
 var options = {
   name: 'Your application name',
-  icns: '/path/to/icns/file' // (optional, only for MacOS),
+  icns: '/path/to/icns/file', // (optional, only for MacOS),
   process: {
     options: {
       // Can use custom environment variables for your privileged subprocess
@@ -133,10 +151,11 @@ export default {
     target: 'electron',
     node: {
         /* http://webpack.github.io/docs/configuration.html#node */
-        __dirname: true
+        __dirname: true,
     },
-    externals: nodeModules
+    externals: nodeModules,
 };
+
 ```
 
 ## NixOS Development
