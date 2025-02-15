@@ -35,10 +35,12 @@ If you don't trust binaries bundled in `npm` package you can manually build tool
 - Separate password prompt for each call (use `sh` or `bat` script for single prompt)
 - No external dependencies, does not depend on OS versions
 - Native NixOS support with automatic detection and configuration
+- Full TypeScript support with proper type definitions
+- Improved error handling and process management
 
 ## Installation
 ```bash
-npm install electron-sudo
+npm install electron-sudo-universal
 ```
 
 ### NixOS Setup
@@ -65,97 +67,90 @@ sudo nixos-rebuild switch
 
 **Note: Your command should not start with the `sudo` prefix.**
 
-### Version 4.0.*
+### TypeScript Usage
+```typescript
+import BaseSudoer from 'electron-sudo-universal';
+import { SudoerOptions } from 'electron-sudo-universal/types';
 
-```javascript
-import BaseSudoer from 'electron-sudo';
-
-let options = {name: 'electron sudo application'},
-    sudoer = new BaseSudoer(options);
+const options: SudoerOptions = {
+    name: 'electron sudo application'
+};
+const sudoer = new BaseSudoer(options);
 
 /* Spawn subprocess behavior */
-let cp = await sudoer.spawn(
-  'echo', ['$PARAM'], {env: {PARAM: 'VALUE'}}
+const cp = await sudoer.spawn(
+    'echo', ['$PARAM'], {env: {PARAM: 'VALUE'}}
 );
 cp.on('close', () => {
-  /*
-    cp.output.stdout (Buffer)
-    cp.output.stderr (Buffer)
-  */
+    /*
+      cp.output.stdout (Buffer)
+      cp.output.stderr (Buffer)
+    */
 });
 
 /* Exec subprocess behavior */
-let result = await sudoer.exec(
-  'echo $PARAM', {env: {PARAM: 'VALUE'}}
+const result = await sudoer.exec(
+    'echo $PARAM', {env: {PARAM: 'VALUE'}}
 );
-/* result is Buffer with mixed (both stdout and stderr) output */
-
-
-/* Usage with Vanilla JS */
-var BaseSudoer = require('electron-sudo').default;
-var sudoer = new BaseSudoer(options);
-sudoer.spawn('echo', ['$PARAM'], {env: {PARAM: 'VALUE'}}).then(function (cp) {
-  /*
-    cp.output.stdout (Buffer)
-    cp.output.stderr (Buffer)
-  */
-});
-
+/* result contains stdout and stderr as Buffer */
 ```
 
-### Version 3.0.* (deprecated)
-
+### JavaScript (CommonJS) Usage
 ```javascript
-var sudo = require('electron-sudo');
-var options = {
-  name: 'Your application name',
-  icns: '/path/to/icns/file', // (optional, only for MacOS),
-  process: {
-    options: {
-      // Can use custom environment variables for your privileged subprocess
-      env: {'VAR': 'VALUE'}
-      // ... and all other subprocess options described here
-      // https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback
-    },
-    on: function(ps) {
-      ps.stdout.on('data', function(data) {});
-      setTimeout(function() {
-        ps.kill()
-      }.bind(ps), 50000);
-    }
-  }
-};
-sudo.exec('echo hello', options, function(error) {});
+const { default: BaseSudoer } = require('electron-sudo-universal');
+
+const sudoer = new BaseSudoer({
+    name: 'electron sudo application'
+});
+
+// Use the same API as shown in TypeScript example
 ```
 
 ## Tests
 ```bash
-npm i && npm test
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+
+# Run Windows-specific tests
+npm run test-win32
 ```
 
 ## Usage with Webpack
 
-Webpack config should contain `__dirname` equals `true` for work properly:
+Webpack configuration example:
 
-```javascript
-let nodeModules = fs.readdirSync('./node_modules')
-    .filter((module) => {
-        return module !== '.bin';
-    })
-    .reduce((prev, module) => {
-        return Object.assign(prev, {[module]: 'commonjs ' + module});
-    }, {});
+```typescript
+import path from 'path';
 
 export default {
-    ...
-    target: 'electron',
-    node: {
-        /* http://webpack.github.io/docs/configuration.html#node */
-        __dirname: true,
+    entry: './src/index.ts',
+    target: 'electron-main',
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
+        ],
     },
-    externals: nodeModules,
+    resolve: {
+        extensions: ['.ts', '.js'],
+    },
+    output: {
+        filename: 'index.js',
+        path: path.resolve(__dirname, 'dist'),
+    },
+    node: {
+        __dirname: true
+    },
+    externals: {
+        electron: 'electron'
+    }
 };
-
 ```
 
 ## NixOS Development
@@ -213,3 +208,7 @@ If you see "pkexec must be setuid root", ensure polkit is properly configured:
   ];
 }
 ```
+
+## License
+
+MIT
